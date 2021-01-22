@@ -1,0 +1,22 @@
+{
+  "name": "searchalbumsbyname",
+  "version": "1.0.0",
+  "description": "type in an artist's name and will search for all the albums of the artist via Spotify API",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Joanne Chen",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cookie-session": "^1.4.0",
+    "csurf": "^1.11.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^4.4.1",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^8.5.1"
+  }
+}
