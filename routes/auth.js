@@ -4,28 +4,40 @@ const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
-
 // router.get('/', (req, res) => res.send('Auth route!'));
 // router.get('/more', (req, res) => res.send('Auth more route!'));
 
 // @ sending client id, redirect uri, response type to fetch a code
 router.get('/login', (req, res) => {
-    res.redirect(`https://accounts.spotify.com/authorize?${querystring.stringify({
-        response_type: 'code',
-        client_id: process.env.SPOTIFY_CLIENT_ID,
-        redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
-    })}`);
+
+    try {
+        res.redirect(`https://accounts.spotify.com/authorize?${querystring.stringify({
+            response_type: 'code',
+            client_id: process.env.SPOTIFY_CLIENT_ID,
+            redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
+    
+        })}`);
+        
+    } catch (err) {
+              console.error(err.message);
+        res.status(500).send('Server Error!');
+    }
 });
 
-// @ the callback after login in to get the tokens
+
+// @ the callback after login in to get the tokens after receiving the code 
 router.get('/callback', async (req, res) => {
-    const {code} = req.query;
+    
+    const {code} = req.query;  
     const clientId = process.env.SPOTIFY_CLIENT_ID;
     const secret = process.env.SPOTIFY_CLIENT_SECRET;
     const redirect_uri = process.env.SPOTIFY_REDIRECT_URI;
     const grant_type = 'authorization_code';
     
     const basicHeader = Buffer.from(`${clientId}:${secret}`).toString('base64');
+
+    console.log({code});
+   
 
     const {data} = await axios.post('https://accounts.spotify.com/api/token', querystring.stringify({
         grant_type,
@@ -44,29 +56,37 @@ router.get('/callback', async (req, res) => {
 
     req.session.jwt = jwt.sign(sessionJWTObject, process.env.JWT_SECRET_KEY)
     return res.redirect('/');
+
 });
 
 router.get('/current-session', (req, res) => {
-    jwt.verify(req.session.jwt, process.env.JWT_SECRET_KEY, (err, decodedToken) => {
-        if (err || !decodedToken) {
-            res.send(false);
-        } else {
-            res.send(decodedToken);
-        }
-    });
+    try {
+        jwt.verify(req.session.jwt, process.env.JWT_SECRET_KEY, (err, decodedToken) => {
+            if (err || !decodedToken) {
+                res.send(false);
+            } else {
+                console.log(decodedToken);
+                res.send(decodedToken);
+            }
+        });
+        
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error!');
+    }
 })
 
 router.get('/logout', (req, res) => {
-    req.session = null;
-    res.redirect(
-        `/`
-    );
+    try {
+        req.session = null;
+        res.redirect(
+            `/`
+        );
+        
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error!');   
+    }
 });
-
-module.exports = router;
-
-
-
-
 
 module.exports = router;
