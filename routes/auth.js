@@ -89,4 +89,28 @@ router.get('/logout', (req, res) => {
     }
 });
 
+router.get('/search/:token/:name', async (req, res) => {
+    console.log(req.params.token)
+    console.log(req.params.name)
+    const {data} = await axios.get(`http://api.spotify.com/v1/search?q=${req.params.name}&type=artist`, {
+        headers: {
+            "Authorization": `Bearer ${req.params.token}`
+        }
+    })
+
+    const artistId = data.artists.items[0].id;
+    console.log(artistId)
+
+    const albumData = await axios.get(`http://api.spotify.com/v1/artists/${artistId}/albums`, {
+        headers: {
+            "Authorization": `Bearer ${req.params.token}`
+        }
+    })
+
+    console.log(albumData.data.items);
+    const albumArr = albumData.data.items;
+    console.log(albumArr.length);
+
+});
+
 module.exports = router;
