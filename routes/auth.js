@@ -90,27 +90,42 @@ router.get('/logout', (req, res) => {
 });
 
 router.get('/search/:token/:name', async (req, res) => {
-    console.log(req.params.token)
-    console.log(req.params.name)
-    const {data} = await axios.get(`http://api.spotify.com/v1/search?q=${req.params.name}&type=artist`, {
-        headers: {
-            "Authorization": `Bearer ${req.params.token}`
-        }
-    })
+    // console.log(req.params.token)
+    // console.log(req.params.name)
+    try {   
+        const {data} = await axios.get(`http://api.spotify.com/v1/search?q=${req.params.name}&type=artist`, {
+            headers: {
+                "Authorization": `Bearer ${req.params.token}`
+            }
+        })
+        
+        const artistId = data.artists.items[0].id;
+        // console.log(artistId)
+        
+        const albumData = await axios.get(`http://api.spotify.com/v1/artists/${artistId}/albums`, {
+            headers: {
+                "Authorization": `Bearer ${req.params.token}`
+            }
+        })
+        
+        const albumArr = albumData.data.items;
+        
+        const filteredArr = albumArr.reduce((acc, current) => {
+            const x = acc.find(item => item.name === current.name);
+            if (!x) {
+                return acc.concat([current]);
+            } else {
+                return acc;
+            }
+        }, []);
+        
+        console.log(filteredArr);
+        res.send(filteredArr);
 
-    const artistId = data.artists.items[0].id;
-    console.log(artistId)
-
-    const albumData = await axios.get(`http://api.spotify.com/v1/artists/${artistId}/albums`, {
-        headers: {
-            "Authorization": `Bearer ${req.params.token}`
-        }
-    })
-
-    console.log(albumData.data.items);
-    const albumArr = albumData.data.items;
-    console.log(albumArr.length);
-
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error!'); 
+    }
 });
 
 module.exports = router;
