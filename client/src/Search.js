@@ -1,36 +1,23 @@
 import axios from 'axios';
-import React, {useState, useEffect} from 'react';
+import React, {Fragment, useState} from 'react';
 import './App.css';
+import Card from 'react-bootstrap/Card';
+import Container from 'react-bootstrap/Container'
 
 
 const Search = ({auth}) => {
     const {token} = auth;
     const [name, setName] = useState("");
-    const [artistId, setArtistId] = useState(null)
+    const [albumData, setAlbumData] = useState([]);
 
     const searchAlbum = async (name) => {
         setName(name);
 
-
         const {data} = await axios.get(`/auth/search/${token}/${name}`) // proxy issues cannot use localhost:8080
-        console.log(data)
 
-
-
-            ////  if I call fetch the API from client:
-            // const {data} = await axios.get(`http://api.spotify.com/v1/search?q=${name}&type=artist`, {
-            //     headers: {
-            //         "Authorization": `Bearer ${token}`
-            //     }
-            // })  
-            // setArtistId(data.artists.items[0].id);
-            // console.log(artistId)
-            ////
-
-       
+        setAlbumData(data)        
     }
-
-
+        console.log(albumData)
  return ( 
     <div className={"App"}>
         <h2>Hello I'm logged in and now we can search albums by artist's name</h2>
@@ -52,8 +39,37 @@ const Search = ({auth}) => {
         >
             Search
         </button>
-    </div> 
-    
+        <Fragment>
+            <Container fluid>
+                <div style={pageStyle}>
+                    {albumData.map((album, id) => (
+                        <Card key={album.id} style={cardStyle}>
+                            <Card.Img variant="top" src={album.images[1].url}></Card.Img>
+                            <Card.Body>
+                                <Card.Title>{album.name}</Card.Title>
+                            </Card.Body>
+                        </Card>
+                    ) )}
+                </div>
+            </Container>
+        </Fragment>
+    </div>    
     )
 }
+
+const cardStyle = {
+    maxHeight: '35rem', 
+    maxWidth: '30rem', 
+    padding: '5rem', 
+    margin: '2rem'
+}
+
+const pageStyle = {
+    display: "flex",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justfyContent: 'space-evenly'
+}
+
+
 export default Search;
