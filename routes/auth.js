@@ -80,7 +80,7 @@ router.get('/logout', (req, res) => {
     try {
         req.session = null;
         res.redirect(
-            `/`
+            'http://localhost:3000/'
         );
         
     } catch (err) {
