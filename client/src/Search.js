@@ -15,7 +15,8 @@ const Search = ({auth}) => {
 
         const {data} = await axios.get(`/auth/search/${token}/${name}`) // proxy issues cannot use localhost:8080
 
-        setAlbumData(data)        
+        setAlbumData(data);
+        setName("");        
     }
         console.log(albumData)
  return ( 
@@ -42,7 +43,7 @@ const Search = ({auth}) => {
         <Fragment>
             <Container fluid>
                 <div style={pageStyle}>
-                    {albumData.map((album, id) => (
+                    {albumData.map(album => (
                         <Card key={album.id} style={cardStyle}>
                             <Card.Img variant="top" src={album.images[1].url}></Card.Img>
                             <Card.Body>
